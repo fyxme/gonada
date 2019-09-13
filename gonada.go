@@ -1,4 +1,4 @@
-package main
+package gonada
 
 // https://gist.github.com/dmikalova/5693142
 
@@ -45,7 +45,7 @@ type getNadaEmail struct {
 }
 
 func (gn *GetNada) RefreshDomains() {
-    url := generateURL("/domains")
+    url := generateURL("domains")
     res, err := http.Get(url)
     if err != nil {
         panic(err)
@@ -76,12 +76,9 @@ func (gn *GetNada) GetDomains() []string {
     return list
 }
 
-func (gni *getNadaInbox) IsEmpty() bool {
-    return len(gni.Msgs) > 0
-}
 
 func (gn *GetNada) GetInbox(address string) getNadaInbox {
-    url := generateURL("/inboxes", address)
+    url := generateURL("inboxes", address)
     gni := getNadaInbox{}
     res, err := http.Get(url)
     if err != nil {
@@ -101,12 +98,16 @@ func (gn *GetNada) GetInbox(address string) getNadaInbox {
     return gni
 }
 
+func (gni *getNadaInbox) IsEmpty() bool {
+    return len(gni.Msgs) == 0
+}
+
 func (gne *getNadaEmail) GetContents() string {
     if gne.Html != nil {
         return *gne.Html
     }
 
-    url := generateURL("/messages", gne.Uid)
+    url := generateURL("messages", gne.Uid)
 
     res, err := http.Get(url)
     if err != nil {
@@ -118,7 +119,7 @@ func (gne *getNadaEmail) GetContents() string {
     if err != nil {
         panic(err)
     }
-    fmt.Println(string(body))
+
     err = json.Unmarshal(body, gne)
     if err != nil {
         panic(err)
@@ -126,12 +127,3 @@ func (gne *getNadaEmail) GetContents() string {
     return *gne.Html
 }
 
-func main() {
-    gn := GetNada{}
-    gn.RefreshDomains()
-    fmt.Println(gn.GetDomains())
-    fmt.Println(gn.GetInbox("test@getnada.com").Msgs[0].GetContents())
-
-    r, _ := regexp.Compile("http://firbiz.ru/joomla/index")
-    fmt.Println(r.FindString(gn.GetInbox("test@getnada.com").Msgs[0].GetContents()))
-}
