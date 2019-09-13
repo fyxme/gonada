@@ -1,8 +1,8 @@
 # gonada
 
-gonada is a Golang wrapper around the [getnada.com](https://getnada.com) API. 
+gonada is a Golang wrapper around the [getnada.com](https://getnada.com) API. (getnada.com is a temp email provider)
 
-getnada.com is a temp email provider.
+This was originally made in order to test emails and email confirmations sent by a webapp.
 
 The Unofficial API Documentation can be found [here](https://github.com/fyxme/pynada#api).
 
@@ -65,3 +65,6 @@ func main() {
 }
 ```
 
+## TODO
+
+- Refactor the requests into one request function and return the response
