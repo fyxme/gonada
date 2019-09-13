@@ -3,12 +3,10 @@ package gonada
 // https://gist.github.com/dmikalova/5693142
 
 import (
-    "fmt"
     "net/http"
     "encoding/json"
     "io/ioutil"
     "strings"
-    "regexp"
 )
 
 const (
