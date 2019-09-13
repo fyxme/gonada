@@ -16,27 +16,52 @@ Other wrappers:
 ## How to use
 
 ```Golang
-import "github.com/fyxme/gonada"
+package main
+
+import (
+    "regexp"
+    "fmt"
+    "github.com/fyxme/gonada"
+)
 
 func main() {
-    gn := GetNada{}
+    gn := gonada.GetNada{}
 
     // list of available domains to use as emails
     domains := gn.GetDomains()
     fmt.Println(domains)
-    
-    email := "test" + domains[0]
+
+    email := fmt.Sprintf("%s@%s", "test", domains[0])
     gni := gn.GetInbox(email)
     if gni.IsEmpty() {
         fmt.Println("Inbox is empty")
     }
-    
+
+    // get the contents of the first email in the mailbox
+    firstMail := gni.Msgs[0]
+    fmt.Println(
+        firstMail.FromName,
+        firstMail.FromEmail,
+        firstMail.Subject,
+        firstMail.Timestamp,
+        firstMail.GetContents()[:10],
+    )
+
     // find a comfirmation link inside of an email
     r, _ := regexp.Compile("http://somewebsite.com/confirm_email/[0-9A-Za-z]+")
-    fmt.Println(r.FindString(gni.Msgs[0].GetContents()))
+    fromEmail := "do-not-reply@somewebsite.com"
+    for _, mail := range gni.Msgs {
+        // skip email if not from right address
+        if mail.FromEmail != fromEmail {
+            continue
+        }
 
-    // Alternatively you can use it as such
-    fmt.Println(r.FindString(gn.GetInbox(email).Msgs[0].GetContents()))
+        if confirmLink := r.FindString(mail.GetContents()); confirmLink != "" {
+            // do something with confirmlink here
+            fmt.Println(confirmLink)
+            break
+        }
+    }
 }
 ```
 
